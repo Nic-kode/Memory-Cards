@@ -1,121 +1,171 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useEffect, useState } from "react";
+import { Card } from "./components/Card";
+import { GameHeader } from "./components/GameHeader";
 
+//Memory card values
+const cardValues = [
+  "🍎",
+  "🍌",
+  "🍇",
+  "🍊",
+  "🍓",
+  "🥝",
+  "🍑",
+  "🍒",
+  "🍎",
+  "🍌",
+  "🍇",
+  "🍊",
+  "🍓",
+  "🥝",
+  "🍑",
+  "🍒",
+];
+
+//Audio
+const flipSound = new Audio("/sounds/flip.mp3");
+const winSound = new Audio("/sounds/win.mp3");
+const pairSound = new Audio("/sounds/pair.mp3");
+const backgroundMuisc = new Audio("/sounds/music.mp3");
+
+flipSound.volume = 0.4;
+winSound.volume = 0.6;
+
+//App
 function App() {
-  const [count, setCount] = useState(0)
+  const [cards, setCards] = useState([]);
+  const [flippedCards, setFlippedCards] = useState([]);
+  const [score, setScore] = useState(0);
+  const [moves, setMoves] = useState(0);
+  const [hasWon, setHasWon] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+
+  //Start music
+  useEffect(() => {
+    backgroundMuisc.loop = true;
+    backgroundMuisc.volume = 0.2;
+
+    const startMusic = () => {
+      if (!isMuted) backgroundMuisc.play();
+      document.removeEventListener("click", startMusic);
+    };
+
+    document.addEventListener("click", startMusic);
+
+    return () => backgroundMuisc.pause();
+  }, [isMuted]);
+
+  const toggleMute = () => {
+    setIsMuted((prev) => !prev);
+
+    if (!isMuted) {
+      backgroundMuisc.pause();
+    } else {
+      backgroundMuisc.play();
+    }
+  };
+
+  //Initialize game
+  const initializeGame = () => {
+    const shuffled = [...cardValues].sort(() => Math.random() - 0.5);
+
+    const finalCards = shuffled.map((value, index) => ({
+      id: index,
+      value,
+      isFlipped: false,
+      isMatched: false,
+    }));
+
+    setCards(finalCards);
+    setScore(0);
+    setMoves(0);
+    setFlippedCards([]);
+    setHasWon(false);
+  };
+
+  useEffect(() => {
+    initializeGame();
+  }, []);
+
+  const handleCardClick = (card) => {
+    flipSound.play();
+    if (card.isFlipped || card.isMatched || flippedCards.length === 2) return;
+
+    setMoves((prev) => prev + 1);
+
+    // Flip card
+    const updatedCards = cards.map((c) =>
+      c.id === card.id ? { ...c, isFlipped: true } : c
+    );
+
+    setCards(updatedCards);
+
+    const newFlipped = [...flippedCards, card.id];
+    setFlippedCards(newFlipped);
+
+    if (newFlipped.length === 2) {
+      const first = updatedCards[newFlipped[0]];
+      const second = updatedCards[newFlipped[1]];
+
+      //If we find a match
+      if (first.value === second.value) {
+        setTimeout(() => {
+          pairSound.play();
+          const matched = updatedCards.map((c) =>
+            c.id === first.id || c.id === second.id
+              ? { ...c, isMatched: true }
+              : c
+          );
+          setScore((prev) => prev + 1);
+          setCards(matched);
+          setFlippedCards([]);
+
+          // comprobar victoria
+          const allMatched = matched.every((c) => c.isMatched);
+          if (allMatched) {
+            setHasWon(true);
+            winSound.play();
+          }
+        }, 300);
+
+        //If we don't
+      } else {
+        setTimeout(() => {
+          const reset = updatedCards.map((c) =>
+            newFlipped.includes(c.id) ? { ...c, isFlipped: false } : c
+          );
+          setCards(reset);
+          setFlippedCards([]);
+        }, 1000);
+      }
+    }
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="app">
+      <button className="mute-btn" onClick={toggleMute}>
+        {isMuted ? "🔇" : "🔊"}
+      </button>
+      <GameHeader score={score} moves={moves} />
 
-      <div className="ticks"></div>
+      <div className="cards-grid">
+        {cards.map((card) => (
+          <Card key={card.id} card={card} onClick={handleCardClick} />
+        ))}
+      </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+      {hasWon && (
+        <div className="modal">
+          <div className="modal-content">
+            <h2>🎉 Has ganado!</h2>
+            <p>Lo has conseguido en {moves} movimientos</p>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+            <button onClick={initializeGame}>Volver a jugar</button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;
