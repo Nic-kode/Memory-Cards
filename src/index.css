@@ -167,6 +167,16 @@ body {
   width: 100%;
 }
 
+.cards-grid.easy {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.cards-grid.hard {
+  grid-template-columns: repeat(8, 1fr);
+  max-width: 900px;
+  font-size: 3rem;
+}
+
 .card {
   aspect-ratio: 1;
   position: relative;
@@ -257,6 +267,35 @@ body {
   margin-top: 15px;
   padding: 10px 20px;
   cursor: pointer;
+}
+
+.difficulty-btn {
+  padding: 12px 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.difficulty-btn.hard {
+  background: #a1a1aa; /* gris claro */
+}
+
+.difficulty-btn.easy {
+  background: #ef4444; /* rojo */
+}
+
+.difficulty-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+
+.difficulty-btn:active {
+  transform: translateY(0);
 }
 
 .mute-btn {

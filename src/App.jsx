@@ -12,14 +12,14 @@ const cardValues = [
   "🥝",
   "🍑",
   "🍒",
-  "🍎",
-  "🍌",
-  "🍇",
-  "🍊",
-  "🍓",
-  "🥝",
-  "🍑",
-  "🍒",
+  "🍍",
+  "🥥",
+  "🍉",
+  "🍋",
+  "🥭",
+  "🍈",
+  "🍏",
+  "🍐",
 ];
 
 //Audio
@@ -39,6 +39,7 @@ function App() {
   const [moves, setMoves] = useState(0);
   const [hasWon, setHasWon] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [difficulty, setDifficulty] = useState("easy");
 
   //Start music
   useEffect(() => {
@@ -65,9 +66,22 @@ function App() {
     }
   };
 
+  //difficulty
+  const toggleDifficulty = () => {
+    if (flippedCards.length > 0) return;
+    setDifficulty((prev) => (prev === "easy" ? "hard" : "easy"));
+  };
+
   //Initialize game
   const initializeGame = () => {
-    const shuffled = [...cardValues].sort(() => Math.random() - 0.5);
+    const values =
+      difficulty === "easy"
+        ? cardValues.slice(0, 8) // 8 parejas → 16 cartas
+        : cardValues.slice(0, 16); // 16 parejas → 32 cartas
+
+    const duplicated = [...values, ...values];
+
+    const shuffled = duplicated.sort(() => Math.random() - 0.5);
 
     const finalCards = shuffled.map((value, index) => ({
       id: index,
@@ -85,7 +99,7 @@ function App() {
 
   useEffect(() => {
     initializeGame();
-  }, []);
+  }, [difficulty]);
 
   const handleCardClick = (card) => {
     flipSound.play();
@@ -146,9 +160,14 @@ function App() {
       <button className="mute-btn" onClick={toggleMute}>
         {isMuted ? "🔇" : "🔊"}
       </button>
-      <GameHeader score={score} moves={moves} />
+      <GameHeader
+        score={score}
+        moves={moves}
+        difficulty={difficulty}
+        onToggleDifficulty={toggleDifficulty}
+      />
 
-      <div className="cards-grid">
+      <div className={`cards-grid ${difficulty}`}>
         {cards.map((card) => (
           <Card key={card.id} card={card} onClick={handleCardClick} />
         ))}
