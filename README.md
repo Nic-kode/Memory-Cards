@@ -4,7 +4,6 @@ A classic memory matching game with multiple difficulty levels.
 
 ## 🚀 Features
 - Easy and Hard modes
-- Timer tracking
 - Score system
 
 ## 🛠️ Tech Stack
@@ -22,4 +21,4 @@ A classic memory matching game with multiple difficulty levels.
 - Animations improvements
 
 ## 👨‍💻 Author
-Your Name
+Dominick Gili
