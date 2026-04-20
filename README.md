@@ -12,8 +12,8 @@ A classic memory matching game with multiple difficulty levels.
 - CSS
 
 ## 📸 Preview
-![preview](./preview.png)
-![preview](./preview2.png)
+![preview](/src/images/preview.png)
+![preview](/src/images/preview2.png)
 
 ## 📌 Future Improvements
 - Multiplayer mode
