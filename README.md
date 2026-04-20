@@ -9,6 +9,8 @@ A classic memory matching game with multiple difficulty levels.
 
 ## 🛠️ Tech Stack
 - React
+- HTML
+- Javascript
 - CSS
 
 ## 📸 Preview
